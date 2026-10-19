@@ -2,7 +2,55 @@
 
 A Model Context Protocol server with **11 tools**, Codeforces account authorization, and a Cloudflare Workers deployment. Users connect their own Codeforces account through a browser; they do not create a separate service account.
 
-## Share it with others
+## Connect your AI assistant
+
+**Server address:** `https://codeforces-mcp.rajaa-ai.co.in/mcp`
+
+### 1. Get a Codeforces API key
+
+Open [codeforces.com/settings/api](https://codeforces.com/settings/api), click **Add API key**, and keep the **Key** and **Secret** handy.
+
+### 2. Add the server
+
+**Claude Code**
+
+```bash
+claude mcp add --transport http codeforces https://codeforces-mcp.rajaa-ai.co.in/mcp
+```
+
+Then type `/mcp` in Claude Code → **codeforces** → **Authenticate**.
+
+**Codex CLI**
+
+```bash
+codex mcp add codeforces --url https://codeforces-mcp.rajaa-ai.co.in/mcp
+```
+
+If the browser doesn't open, run `codex mcp login codeforces`.
+
+**Claude.ai / Claude Desktop**
+
+**Settings → Connectors → Add custom connector**, paste the address, then click **Connect**.
+
+**Other apps (Cursor, VS Code, …)**
+
+Add a remote (HTTP) MCP server with the address above, e.g.:
+
+```json
+{ "mcpServers": { "codeforces": { "url": "https://codeforces-mcp.rajaa-ai.co.in/mcp" } } }
+```
+
+### 3. Log in
+
+A browser page opens. Enter your API key and secret, then click **Connect account**. Done.
+
+Try: *"Show my Codeforces friends."*
+
+> Only enter your key on that page — never paste it into a chat.
+
+**Problems?** "Could not verify" → check the key and secret aren't swapped. "Start the connection again" → retry from your app. **To disconnect,** remove the server from your app and delete the key on Codeforces.
+
+## Run your own copy
 
 Follow [DEPLOY.md](DEPLOY.md) to deploy the remote service to Cloudflare. Share the resulting `https://YOUR_WORKER_HOST/mcp` URL. OAuth-compatible MCP clients open the browser connection page automatically.
 
@@ -15,7 +63,7 @@ Anyone can deploy their own copy. Each deployment has its own Codeforces rate li
 Requires Node.js 22.15 or newer and outbound HTTPS access to `codeforces.com`.
 
 ```bash
-git clone https://github.com/rAjaa1729/codeforces-mcp.git
+git clone https://github.com/rajaaiitd/codeforces-mcp.git
 cd codeforces-mcp
 npm ci
 npm run smoke
