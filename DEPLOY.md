@@ -40,6 +40,18 @@ npm run deploy
 
 Wrangler creates the SQLite-backed Durable Object through the checked-in migration. The deploy script stops if placeholder values remain. Once deployed, share the HTTPS URL ending in `/mcp`; the home page also displays it. A custom domain can be configured in Cloudflare; if you switch origins, update `PUBLIC_ORIGIN` and reconnect clients because tokens are bound to the previous audience.
 
+### Deploy automatically on every push
+
+Connect the repo once in the Cloudflare dashboard: **Workers & Pages → codeforces-mcp → Settings → Build → Connect**, then set:
+
+| Setting | Value |
+| --- | --- |
+| Branch | `main` |
+| Build command | `npm ci && npm test` |
+| Deploy command | `npm run deploy` |
+
+Every push to `main` then runs the tests and deploys. If a test fails, nothing is deployed and the live service keeps running the previous version.
+
 The Worker uses one KV namespace (`OAUTH_KV`) and one named Durable Object (`API_COORDINATOR`, instance `global`). Preserve the namespace and Durable Object storage across deployments. Don't put production credentials in local test fixtures or enable logging of request bodies, authorization headers, or Codeforces signed URLs.
 
 ## Verify the deployment
