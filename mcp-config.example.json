@@ -1,0 +1,10 @@
+{
+  "mcpServers": {
+    "codeforces": {
+      "command": "node",
+      "args": [
+        "/absolute/path/to/codeforces-mcp/src/index.js"
+      ]
+    }
+  }
+}

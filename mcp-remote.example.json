@@ -1,0 +1,7 @@
+{
+  "mcpServers": {
+    "codeforces": {
+      "url": "https://codeforces-mcp.YOUR_SUBDOMAIN.workers.dev/mcp"
+    }
+  }
+}

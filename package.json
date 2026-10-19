@@ -1,0 +1,22 @@
+{
+  "name": "codeforces-mcp",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Codeforces MCP with account authorization and Cloudflare hosting",
+  "license": "MIT",
+  "type": "module",
+  "engines": { "node": ">=22.15" },
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test test/*.test.js",
+    "smoke": "node scripts/smoke.js",
+    "dev": "npx wrangler@4.133.0 dev --env development --port 8787",
+    "check:worker": "npx wrangler@4.133.0 deploy --env \"\" --dry-run --outdir dist",
+    "deploy": "node scripts/check-deploy.js && npx wrangler@4.133.0 deploy --env \"\""
+  },
+  "dependencies": {
+    "@cloudflare/workers-oauth-provider": "1.2.3",
+    "@modelcontextprotocol/server": "2.3.1",
+    "zod": "^4.2.0"
+  }
+}

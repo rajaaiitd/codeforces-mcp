@@ -1,0 +1,31 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "codeforces-mcp",
+  "main": "src/cloudflare/worker.js",
+  "compatibility_date": "2026-10-01",
+  "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
+  "workers_dev": false,
+  "preview_urls": false,
+  "routes": [{ "pattern": "codeforces-mcp.rajaa-ai.co.in", "custom_domain": true }],
+  "vars": {
+    "PUBLIC_ORIGIN": "https://codeforces-mcp.rajaa-ai.co.in",
+    "ALLOWED_ORIGINS": ""
+  },
+  "kv_namespaces": [
+    { "binding": "OAUTH_KV", "id": "110577a1e8a2442abad1b55bf2f021b2" }
+  ],
+  "durable_objects": {
+    "bindings": [{ "name": "API_COORDINATOR", "class_name": "ApiCoordinator" }]
+  },
+  "migrations": [{ "tag": "v1", "new_sqlite_classes": ["ApiCoordinator"] }],
+  "observability": { "enabled": false },
+  "env": {
+    "development": {
+      "vars": { "PUBLIC_ORIGIN": "http://localhost:8787", "ALLOWED_ORIGINS": "" },
+      "kv_namespaces": [{ "binding": "OAUTH_KV", "id": "local-oauth" }],
+      "durable_objects": {
+        "bindings": [{ "name": "API_COORDINATOR", "class_name": "ApiCoordinator" }]
+      }
+    }
+  }
+}
