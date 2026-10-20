@@ -12,7 +12,7 @@
     "ALLOWED_ORIGINS": ""
   },
   "kv_namespaces": [
-    { "binding": "OAUTH_KV", "id": "110577a1e8a2442abad1b55bf2f021b2" }
+    { "binding": "OAUTH_KV", "id": "798e230b7aa744a3a7b364a9153a9bf2" }
   ],
   "durable_objects": {
     "bindings": [{ "name": "API_COORDINATOR", "class_name": "ApiCoordinator" }]
