@@ -1,40 +1,43 @@
 # Codeforces MCP
 
-A Model Context Protocol server with **11 tools**, Codeforces account authorization, and a Cloudflare Workers deployment. Users connect their own Codeforces account through a browser; they do not create a separate service account.
+Connect your AI assistant to your Codeforces account, so you can plan and review your practice just by asking.
 
-## Connect your AI assistant
+Works with **Claude Code**, **Codex**, **Claude.ai** and any app that supports MCP.
 
-**Server address:** `https://codeforces-mcp.rajaa-ai.co.in/mcp`
+### Why I built this
+
+Practicing on Codeforces means a lot of tab-switching: finding problems at the right rating, checking which ones you've already solved, looking up upcoming contests, reviewing your verdicts and rating history. I wanted to just *ask* instead:
+
+- *"Give me five unsolved DP problems around 1400."*
+- *"Which of my recent submissions failed, and on what?"*
+- *"When's the next Div. 2, and how did my last three contests go?"*
+
+This MCP server lets your AI assistant answer questions like these from live Codeforces data. It's built for **practice** — finding the right next problem and learning from your mistakes — not for solving problems for you, and never for rated contests.
+
+```text
+https://codeforces-mcp.rajaa-ai.co.in/mcp
+```
+
+**Contents:** [For users](#for-users) · [For developers](#for-developers)
+
+---
+
+## For users
 
 ### 1. Get a Codeforces API key
 
-Open [codeforces.com/settings/api](https://codeforces.com/settings/api), click **Add API key**, and keep the **Key** and **Secret** handy.
+Open [codeforces.com/settings/api](https://codeforces.com/settings/api) → **Add API key**. Keep the **Key** and **Secret** handy.
 
-### 2. Add the server
+### 2. Add the server to your app
 
-**Claude Code**
+| App | How |
+| --- | --- |
+| **Claude Code** | `claude mcp add --transport http codeforces https://codeforces-mcp.rajaa-ai.co.in/mcp`<br>then type `/mcp` → **codeforces** → **Authenticate** |
+| **Codex CLI** | `codex mcp add codeforces --url https://codeforces-mcp.rajaa-ai.co.in/mcp`<br>if the browser doesn't open: `codex mcp login codeforces` |
+| **Claude.ai / Desktop** | **Settings → Connectors → Add custom connector** → paste the address → **Connect** |
+| **Cursor, VS Code, others** | Add a remote (HTTP) MCP server with the address above |
 
-```bash
-claude mcp add --transport http codeforces https://codeforces-mcp.rajaa-ai.co.in/mcp
-```
-
-Then type `/mcp` in Claude Code → **codeforces** → **Authenticate**.
-
-**Codex CLI**
-
-```bash
-codex mcp add codeforces --url https://codeforces-mcp.rajaa-ai.co.in/mcp
-```
-
-If the browser doesn't open, run `codex mcp login codeforces`.
-
-**Claude.ai / Claude Desktop**
-
-**Settings → Connectors → Add custom connector**, paste the address, then click **Connect**.
-
-**Other apps (Cursor, VS Code, …)**
-
-Add a remote (HTTP) MCP server with the address above, e.g.:
+For apps that use an `mcpServers` JSON file:
 
 ```json
 { "mcpServers": { "codeforces": { "url": "https://codeforces-mcp.rajaa-ai.co.in/mcp" } } }
@@ -42,130 +45,113 @@ Add a remote (HTTP) MCP server with the address above, e.g.:
 
 ### 3. Log in
 
-A browser page opens. Enter your API key and secret, then click **Connect account**. Done.
+A browser page opens. Enter your **API key** and **secret** → **Connect account**. Done.
 
-Try: *"Show my Codeforces friends."*
+> 🔒 Only enter your key on that page — never paste it into a chat.
 
-> Only enter your key on that page — never paste it into a chat.
+### 4. Ask away
 
-**Problems?** "Could not verify" → check the key and secret aren't swapped. "Start the connection again" → retry from your app. **To disconnect,** remove the server from your app and delete the key on Codeforces.
+- *"Show my Codeforces friends."*
+- *"What contests are coming up this week?"*
+- *"Find five graph problems rated 1200–1600."*
+- *"How has tourist's rating changed this year?"*
 
-## Run your own copy
+### What it can do
 
-Follow [DEPLOY.md](DEPLOY.md) to deploy the remote service to Cloudflare. Share the resulting `https://YOUR_WORKER_HOST/mcp` URL. OAuth-compatible MCP clients open the browser connection page automatically.
+| Tool | What it does |
+| --- | --- |
+| `codeforces_user_info` | Profiles, ratings and ranks |
+| `codeforces_user_rating` | Rating history |
+| `codeforces_user_submissions` | Recent submissions and verdicts |
+| `codeforces_contests` | Upcoming and past contests or gyms |
+| `codeforces_problems` | Search problems by tags, rating and name |
+| `codeforces_contest_standings` | Contest standings |
+| `codeforces_contest_submissions` | Submissions in a contest |
+| `codeforces_contest_rating_changes` | Rating changes after a contest |
+| `codeforces_my_friends` 🔑 | Your friends |
+| `codeforces_my_contests` 🔑 | Contests you can access, including private gyms |
+| `codeforces_gym_standings` 🔑 | Standings for your gyms and mashups |
 
-The browser asks for a Codeforces API key and secret, verifies them, and issues an MCP access token. Credentials are encrypted in Cloudflare KV, and each user's authenticated calls remain isolated. Codeforces documents API-key signatures rather than a delegated OAuth sign-in; the MCP service supplies the OAuth authorization layer.
+🔑 = uses your logged-in account.
 
-Anyone can deploy their own copy. Each deployment has its own Codeforces rate limit, so a personal deployment avoids sharing it with other users.
+### Good to know
 
-## Use locally over stdio
+- **Read-only** — it can't submit solutions or change anything on your account.
+- **Your key stays private** — encrypted on the server, never sent to the AI.
+- **Shared speed limit** — about one Codeforces request every 2 seconds for everyone, so busy moments may say *"try again shortly"*.
+- **Not for rated contests** — Codeforces rules ban AI help during rated rounds.
 
-Requires Node.js 22.15 or newer and outbound HTTPS access to `codeforces.com`.
+### Troubleshooting
+
+| You see | Do this |
+| --- | --- |
+| *Could not verify your Codeforces credentials* | Check the key and secret aren't swapped or missing characters |
+| *Start the connection again* | The page expired — reconnect from your app |
+| *Too many requests* / *Codeforces is busy* | Wait a minute and retry |
+
+**To disconnect:** remove the server from your app, then delete the key at [codeforces.com/settings/api](https://codeforces.com/settings/api).
+
+---
+
+## For developers
+
+### How it works
+
+```text
+AI app ──MCP──▶ Cloudflare Worker ──signed API calls──▶ codeforces.com
+                 │
+                 ├─ OAuth login page (asks for your API key + secret)
+                 ├─ KV: encrypted credentials and tokens
+                 └─ Durable Object: one shared request queue (≈1 call / 2.1 s)
+```
+
+The AI app only ever receives an MCP access token. Your Codeforces key is encrypted at rest and used only by the server to sign requests.
+
+### Run locally (stdio)
+
+Needs Node.js 22.15+.
 
 ```bash
 git clone https://github.com/rajaaiitd/codeforces-mcp.git
-cd codeforces-mcp
-npm ci
-npm run smoke
+cd codeforces-mcp && npm ci
+npm run smoke        # starts the server and lists its tools
 ```
 
-`npm ci` installs the dependencies. Stdio mode requires no build step.
-
-Configure your MCP client to launch this process:
-
-- Name: `codeforces`
-- Transport: `stdio`
-- Command: `node`
-- Argument: `/absolute/path/to/codeforces-mcp/src/index.js` (run `pwd` inside the project folder to get the first part)
-- Environment variables: optional `CODEFORCES_API_KEY` and `CODEFORCES_API_SECRET` (both must be supplied together)
-
-For clients that use the `mcpServers` JSON format, merge the entry from [mcp-config.example.json](mcp-config.example.json) into your client configuration. Replace the example path with this project's absolute path. If a desktop client cannot find Node, use the full path printed by `command -v node` as the command.
-
-Your MCP client launches and manages the process. To start it manually, use `node src/index.js`; it waits silently for MCP messages on stdin. Configure the client to run Node directly so stdout contains only protocol messages.
-
-Without credentials, local mode exposes the eight public tools. With both environment variables, it exposes all 11. Set these in your MCP client's protected environment configuration; do not put secrets in chat messages or commit them. Remote mode always requires browser authorization.
-
-## Tools
-
-| Tool | Purpose |
-| --- | --- |
-| `codeforces_user_info` | Profiles, ratings, ranks and organizations for a list of handles |
-| `codeforces_user_rating` | Contest rating history, newest first |
-| `codeforces_user_submissions` | Submission verdicts and problem metadata for a handle |
-| `codeforces_contests` | Contests or gyms, with phase and name filters |
-| `codeforces_problems` | Search by name, contest, tags and rating; includes solve counts and statement links |
-| `codeforces_contest_standings` | Official public standings, with handle filtering |
-| `codeforces_contest_submissions` | Contest submissions, optionally for a handle |
-| `codeforces_contest_rating_changes` | Published contest rating changes, optionally for a handle |
-| `codeforces_my_friends` | The connected account's friends; requires account authorization |
-| `codeforces_my_contests` | Contests available to the connected account, including private gyms and mashups |
-| `codeforces_gym_standings` | Authenticated standings for accessible gyms and mashups |
-
-Example requests in your connected assistant:
-
-- “Show tourist’s profile and latest rating changes.”
-- “What Codeforces contests are coming up?”
-- “Find five graph problems rated 1200–1600, ordered by solve count.”
-- “Show my last 20 submissions for handle `YOUR_HANDLE`.”
-- “Get the standings for contest 566.”
-- “Show my Codeforces friends.”
-- “List the private gyms my connected account can access.”
-
-Tool argument examples:
+Point your app at it (see [mcp-config.example.json](mcp-config.example.json)):
 
 ```json
-{"handles": ["tourist", "Petr"]}
+{ "mcpServers": { "codeforces": { "command": "node", "args": ["/full/path/to/codeforces-mcp/src/index.js"] } } }
 ```
 
-```json
-{"tags": ["graphs"], "minRating": 1200, "maxRating": 1600, "sort": "most_solved", "limit": 5}
-```
+Optional: set `CODEFORCES_API_KEY` and `CODEFORCES_API_SECRET` in the app's settings to unlock the 🔑 tools.
 
-```json
-{"phase": "BEFORE", "limit": 10}
-```
+### Deploy your own server
 
-List tools use a zero-based `offset` and `limit` (default 20, maximum 100). Responses include the total matching items and `nextOffset`. Submission tools use the Codeforces API’s one-based `from` and `count` (default 20, maximum 100). All requested problem tags must match; rating filters exclude unrated problems.
+See [DEPLOY.md](DEPLOY.md) — Cloudflare Workers, with automatic deploys on every push. Your own copy gets its own speed limit.
 
-## Behavior and limits
-
-- Read-only public and authorized account data. No code submission or source-code retrieval.
-- Problem results contain metadata and statement links. Full statement text and editorials are not exposed by these tools.
-- API requests are serialized at least 2.1 seconds apart. The hosted service shares this throttle across users through a Durable Object. The local process has its own throttle. The request queue is bounded; busy callers receive an error asking them to retry.
-- HTTP 429, server errors, and Codeforces call-limit errors retry up to twice with backoff. Each HTTP request has a 20-second timeout.
-- Public responses are cached for 30 seconds; submissions for 10 seconds; problemsets and contest rating changes for five minutes. The public cache holds at most 32 entries. Authenticated responses are not cached in the hosted service.
-- Regular contest standings are fetched anonymously with only `contestId`; filtering and pagination happen locally. Use `codeforces_gym_standings` for authenticated gym/mashup standings. First fetches of large standings and the problemset can take longer.
-- The MCP SDK supports older MCP clients through its stdio and HTTP compatibility layers.
-
-## Verify
+### Commands
 
 ```bash
-npm test
-npm run smoke
-npm run smoke -- --live
-npm run check:worker
+npm test         # unit, OAuth and MCP tests
+npm run smoke    # stdio smoke check (add -- --live to call Codeforces)
+npm run dev      # Cloudflare Worker locally on :8787
+npm run deploy   # deploy to Cloudflare
 ```
 
-The tests cover signed requests, throttling, retries, caching, filtering, pagination, input validation, stdio execution, OAuth discovery, browser consent, token exchange, encrypted credential storage, account isolation, refresh, revocation, PKCE, CSRF and redirect rejection. OAuth tests execute the real provider library and MCP SDK with fake KV/Codeforces responses and a small platform shim. The ordinary smoke check starts the local server and lists its tools without accessing Codeforces. `--live` additionally performs API calls and requires network access from Node.js.
-
-After deploying, follow the live checks in [DEPLOY.md](DEPLOY.md#verify-the-deployment).
-
-## Project layout
+### Project layout
 
 ```text
-src/api.js          Codeforces request signing, throttling and public caching
-src/tools.js        Tool schemas, filters and pagination
-src/account-tools.js Authenticated account tools
-src/server.js       MCP tool registration and result formatting
-src/index.js        Stdio entry point
-src/cloudflare/     OAuth connection flow, consent page and Durable Object
-wrangler.jsonc      Cloudflare deployment configuration
-scripts/smoke.js    MCP connection check, optional live lookup
-test/              API, tools, OAuth and MCP integration tests
+src/api.js            Codeforces request signing, throttling, caching
+src/tools.js          Public tool schemas, filters, pagination
+src/account-tools.js  Logged-in tools
+src/server.js         MCP tool registration
+src/index.js          Local stdio entry point
+src/cloudflare/       Worker, OAuth login page, Durable Object
+test/                 Tests
 ```
 
-Implementation references: [Codeforces API introduction](https://codeforces.com/apiHelp), [API methods](https://codeforces.com/apiHelp/methods), and the [official MCP SDK](https://ts.sdk.modelcontextprotocol.io/v2/).
+References: [Codeforces API](https://codeforces.com/apiHelp) · [MCP TypeScript SDK](https://ts.sdk.modelcontextprotocol.io/v2/)
 
 ## License
 
-[MIT](LICENSE). This is an independent project and is not affiliated with Codeforces.
+[MIT](LICENSE). Independent project, not affiliated with Codeforces.
