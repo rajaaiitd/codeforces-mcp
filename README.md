@@ -8,11 +8,26 @@ Works with **Claude Code**, **Codex**, **Claude.ai** and any app that supports M
 
 Practicing on Codeforces means a lot of tab-switching: finding problems at the right rating, checking which ones you've already solved, looking up upcoming contests, reviewing your verdicts and rating history. I wanted to just *ask* instead:
 
-- *"Give me five unsolved DP problems around 1400."*
+- *"Give me five DP problems rated around 1400 that I haven't tried."*
 - *"Which of my recent submissions failed, and on what?"*
 - *"When's the next Div. 2, and how did my last three contests go?"*
 
 This MCP server lets your AI assistant answer questions like these from live Codeforces data. It's built for **practice** — finding the right next problem and learning from your mistakes — not for solving problems for you, and never for rated contests.
+
+## What you can ask
+
+| Goal | Try asking |
+| --- | --- |
+| 🎯 **Find your next problem** | *"Five DP problems rated 1400–1600, most solved first."*<br>*"Recent greedy + math problems around 1200."* |
+| 🔍 **Learn from mistakes** | *"Which of my last 30 submissions failed, and on which test?"*<br>*"Which tags show up most in my wrong answers?"* |
+| 📈 **Track your progress** | *"Summarize my rating over my last 10 contests."*<br>*"What was my best contest ever?"* |
+| 🗓️ **Plan contests** | *"What contests are coming up this week?"*<br>*"When's the next Div. 2?"* |
+| 🏁 **After a contest** | *"How much rating did I gain in the last round?"*<br>*"Show contest 2000's standings for me and my friends."* |
+| 👥 **Friends and gyms** 🔑 | *"Which of my friends are online right now?"*<br>*"List the private gyms I can access."* |
+
+> 💡 **Tip:** tell your assistant your handle once — *"My Codeforces handle is tourist"* — so it knows who "my" is. (Codeforces doesn't share which account a key belongs to.)
+
+## Server address
 
 ```text
 https://codeforces-mcp.rajaa-ai.co.in/mcp
@@ -51,10 +66,7 @@ A browser page opens. Enter your **API key** and **secret** → **Connect accoun
 
 ### 4. Ask away
 
-- *"Show my Codeforces friends."*
-- *"What contests are coming up this week?"*
-- *"Find five graph problems rated 1200–1600."*
-- *"How has tourist's rating changed this year?"*
+Start with *"My Codeforces handle is …"*, then try anything from [What you can ask](#what-you-can-ask).
 
 ### What it can do
 
@@ -72,7 +84,7 @@ A browser page opens. Enter your **API key** and **secret** → **Connect accoun
 | `codeforces_my_contests` 🔑 | Contests you can access, including private gyms |
 | `codeforces_gym_standings` 🔑 | Standings for your gyms and mashups |
 
-🔑 = uses your logged-in account.
+🔑 = uses your logged-in account. Everything else works for any public handle.
 
 ### Good to know
 
